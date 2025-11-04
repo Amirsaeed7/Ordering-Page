@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>سیستم ثبت سفارش</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              vazir: ["Vazirmatn", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        font-family: "Vazirmatn", sans-serif;
+        background-color: #f3f4f6;
+      }
+      .section {
+        background-color: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      .topping {
+        margin-right: 1.5rem;
+      }
+    </style>
+  </head>
+
+  <body class="max-w-3xl mx-auto py-6 px-4">
+    <h1 class="text-3xl font-bold text-center mb-6">🧾 ثبت سفارش غذا</h1>
+
+    <!-- Order Number -->
+    <div class="text-center text-lg mb-6">
+      شماره سفارش: <span id="orderNumber" class="font-bold text-blue-600">1</span>
+    </div>
+
+    <!-- Menu Container -->
+    <div id="menuContainer" class="flex flex-col gap-2"></div>
+
+    <!-- Submit Food Button -->
+    <div class="flex justify-center mt-6">
+      <button
+        id="submitFood"
+        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+      >
+        افزودن غذا به فاکتور
+      </button>
+    </div>
+
+    <!-- Order Summary -->
+    <div id="orderSummary" class="section mt-8">
+      <h2 class="text-2xl font-bold mb-4">🧾 فاکتور سفارش</h2>
+      <ul id="orderList" class="list-disc pr-6 space-y-2"></ul>
+    </div>
+
+    <!-- Submit Whole Order -->
+    <div class="flex justify-center mt-6">
+      <button
+        id="submitOrder"
+        class="bg-green-600 text-white px-8 py-2 rounded-lg hover:bg-green-700 transition"
+      >
+        ثبت کل سفارش ✅
+      </button>
+    </div>
+
+    <script src="order.js"></script>
+  </body>
+</html>
