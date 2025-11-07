@@ -136,6 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     orderList.innerHTML = "";
     currentOrder.forEach((item, index) => {
       const li = document.createElement("li");
+      li.className = "flex flex-col"
       li.innerHTML = `<strong>${item.food}</strong>${
         item.toppings.length
           ? ` <span class="text-gray-600">(${item.toppings.join(", ")})</span>`
