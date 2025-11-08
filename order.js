@@ -131,17 +131,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedToppings = [];
   });
 
-  // Update order summary
+  // Update order summary (now with delete button per item)
   function updateOrderList() {
     orderList.innerHTML = "";
-    currentOrder.forEach((item) => {
+
+    if (currentOrder.length === 0) {
+      const emptyMsg = document.createElement("li");
+      emptyMsg.className = "text-gray-500";
+      emptyMsg.textContent = "هیچ غذایی در فاکتور ثبت نشده است.";
+      orderList.appendChild(emptyMsg);
+      return;
+    }
+
+    currentOrder.forEach((item, index) => {
       const li = document.createElement("li");
-      li.className = "flex flex-col";
-      li.innerHTML = `<strong>${item.food}</strong>${
-        item.toppings.length
+      li.className = "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md shadow-sm mb-2";
+
+      const info = document.createElement("div");
+      info.innerHTML = `<strong>${item.food}</strong>${
+        item.toppings && item.toppings.length
           ? ` <span class="text-gray-600">(${item.toppings.join(", ")})</span>`
           : ""
       }`;
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "text-red-600 hover:text-red-800 mr-2";
+      deleteBtn.title = "حذف";
+      deleteBtn.innerHTML = "🗑️";
+      deleteBtn.addEventListener("click", () => {
+        // remove this item and re-render
+        currentOrder.splice(index, 1);
+        updateOrderList();
+      });
+
+      li.appendChild(info);
+      li.appendChild(deleteBtn);
       orderList.appendChild(li);
     });
   }
