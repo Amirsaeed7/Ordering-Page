@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const orderList = document.getElementById("orderList");
   const orderNumberEl = document.getElementById("orderNumber");
 
-  let menuData = [];
+  let menuData = {};
   let currentOrder = [];
   let selectedFood = null;
   let selectedToppings = [];
@@ -27,84 +27,86 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderMenu() {
     menuContainer.innerHTML = "";
 
-    menuData.forEach((category, catIndex) => {
-      const section = document.createElement("div");
-      section.className = "section";
+    const section = document.createElement("div");
+    section.className = "menu-section flex flex-col gap-4";
 
-      const title = document.createElement("h2");
-      title.className = "text-xl font-bold mb-3";
-      title.textContent = category.category;
-      section.appendChild(title);
+    // --- Foods list ---
+    const foodSection = document.createElement("div");
+    foodSection.className = "foods mb-4";
 
-      category.items.forEach((food, foodIndex) => {
-        const foodDiv = document.createElement("div");
-        foodDiv.className = "mb-2";
+    const foodTitle = document.createElement("h2");
+    foodTitle.className = "text-xl font-bold mb-2";
+    foodTitle.textContent = "غذاها";
+    foodSection.appendChild(foodTitle);
 
-        const foodLabel = document.createElement("label");
-        foodLabel.className = "font-semibold flex items-center gap-2";
+    const foodList = document.createElement("div");
+    foodList.className = "flex flex-wrap gap-4";
 
-        const foodCheckbox = document.createElement("input");
-        foodCheckbox.type = "checkbox";
-        foodCheckbox.name = `food-${catIndex}`;
-        foodCheckbox.value = food.name;
+    menuData.foods.forEach((food) => {
+      const foodLabel = document.createElement("label");
+      foodLabel.className = "flex items-center gap-2 border p-2 rounded";
 
-        foodCheckbox.addEventListener("change", () => {
-          // Only one food can be selected at a time
-          document
-            .querySelectorAll(`input[name="food-${catIndex}"]`)
-            .forEach((cb) => {
-              if (cb !== foodCheckbox) cb.checked = false;
-            });
+      const foodCheckbox = document.createElement("input");
+      foodCheckbox.type = "checkbox";
+      foodCheckbox.name = "food";
+      foodCheckbox.value = food.name;
 
-          selectedFood = foodCheckbox.checked ? food : null;
-          selectedToppings = [];
-
-          // Reset all topping checkboxes
-          document
-            .querySelectorAll(`.topping-checkbox`)
-            .forEach((cb) => (cb.checked = false));
+      // Only one food can be selected at a time
+      foodCheckbox.addEventListener("change", () => {
+        document.querySelectorAll('input[name="food"]').forEach((cb) => {
+          if (cb !== foodCheckbox) cb.checked = false;
         });
-
-        const foodText = document.createTextNode(food.name);
-        foodLabel.appendChild(foodCheckbox);
-        foodLabel.appendChild(foodText);
-
-        foodDiv.appendChild(foodLabel);
-
-        // Add toppings
-        const toppingsDiv = document.createElement("div");
-        toppingsDiv.className = "ml-6 mt-1";
-
-        food.toppings.forEach((top) => {
-          const topLabel = document.createElement("label");
-          topLabel.className = "flex items-center gap-1 topping";
-
-          const topCheckbox = document.createElement("input");
-          topCheckbox.type = "checkbox";
-          topCheckbox.classList.add("topping-checkbox");
-          topCheckbox.value = top;
-
-          topCheckbox.addEventListener("change", () => {
-            if (topCheckbox.checked) {
-              selectedToppings.push(top);
-            } else {
-              selectedToppings = selectedToppings.filter((t) => t !== top);
-            }
-          });
-
-          const topText = document.createTextNode(top);
-          topLabel.appendChild(topCheckbox);
-          topLabel.appendChild(topText);
-
-          toppingsDiv.appendChild(topLabel);
-        });
-
-        foodDiv.appendChild(toppingsDiv);
-        section.appendChild(foodDiv);
+        selectedFood = foodCheckbox.checked ? food : null;
       });
 
-      menuContainer.appendChild(section);
+      const foodText = document.createTextNode(food.name);
+      foodLabel.appendChild(foodCheckbox);
+      foodLabel.appendChild(foodText);
+      foodList.appendChild(foodLabel);
     });
+
+    foodSection.appendChild(foodList);
+    section.appendChild(foodSection);
+
+    // --- Toppings list ---
+    const toppingSection = document.createElement("div");
+    toppingSection.className = "toppings";
+
+    const toppingTitle = document.createElement("h2");
+    toppingTitle.className = "text-xl font-bold mb-2";
+    toppingTitle.textContent = "تاپینگ‌ها";
+    toppingSection.appendChild(toppingTitle);
+
+    const toppingList = document.createElement("div");
+    toppingList.className = "flex flex-wrap gap-4";
+
+    menuData.toppings.forEach((top) => {
+      const topLabel = document.createElement("label");
+      topLabel.className = "flex items-center gap-2 border p-2 rounded";
+
+      const topCheckbox = document.createElement("input");
+      topCheckbox.type = "checkbox";
+      topCheckbox.classList.add("topping-checkbox");
+      topCheckbox.value = top;
+
+      topCheckbox.addEventListener("change", () => {
+        if (topCheckbox.checked) {
+          selectedToppings.push(top);
+        } else {
+          selectedToppings = selectedToppings.filter((t) => t !== top);
+        }
+      });
+
+      const topText = document.createTextNode(top);
+      topLabel.appendChild(topCheckbox);
+      topLabel.appendChild(topText);
+      toppingList.appendChild(topLabel);
+    });
+
+    toppingSection.appendChild(toppingList);
+    section.appendChild(toppingSection);
+
+    menuContainer.appendChild(section);
   }
 
   // Add food to order summary
@@ -123,9 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateOrderList();
 
     // Reset selections
-    document
-      .querySelectorAll('input[type="checkbox"]')
-      .forEach((cb) => (cb.checked = false));
+    document.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
 
     selectedFood = null;
     selectedToppings = [];
@@ -134,9 +134,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Update order summary
   function updateOrderList() {
     orderList.innerHTML = "";
-    currentOrder.forEach((item, index) => {
+    currentOrder.forEach((item) => {
       const li = document.createElement("li");
-      li.className = "flex flex-col"
+      li.className = "flex flex-col";
       li.innerHTML = `<strong>${item.food}</strong>${
         item.toppings.length
           ? ` <span class="text-gray-600">(${item.toppings.join(", ")})</span>`
@@ -153,8 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const allOrders =
-      JSON.parse(localStorage.getItem("orders")) || [];
+    const allOrders = JSON.parse(localStorage.getItem("orders")) || [];
 
     const newOrder = {
       orderNumber,
