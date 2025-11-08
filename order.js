@@ -10,8 +10,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedFood = null;
   let selectedToppings = [];
 
-  // Load order number from localStorage
-  let orderNumber = parseInt(localStorage.getItem("orderNumber") || "1");
+  // Load order number and date from localStorage
+  let savedOrderNumber = parseInt(localStorage.getItem("orderNumber") || "1");
+  let savedDate = localStorage.getItem("orderDate");
+
+  // Get today's date (YYYY-MM-DD)
+  const today = new Date().toISOString().split("T")[0];
+
+  // If it's a new day, reset order number to 1
+  if (savedDate !== today) {
+    localStorage.setItem("orderNumber", "1");
+    localStorage.setItem("orderDate", today);
+    savedOrderNumber = 1;
+  }
+
+  // Use the (possibly reset) number
+  let orderNumber = savedOrderNumber;
   orderNumberEl.textContent = orderNumber;
 
   // Fetch menu data
@@ -125,7 +139,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateOrderList();
 
     // Reset selections
-    document.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
+    document
+      .querySelectorAll('input[type="checkbox"]')
+      .forEach((cb) => (cb.checked = false));
 
     selectedFood = null;
     selectedToppings = [];
@@ -145,9 +161,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     currentOrder.forEach((item, index) => {
       const li = document.createElement("li");
-      li.className = "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md shadow-sm mb-2";
+      li.className =
+        "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md shadow-sm mb-2";
 
       const info = document.createElement("div");
+      info.className = "flex flex-col";
       info.innerHTML = `<strong>${item.food}</strong>${
         item.toppings && item.toppings.length
           ? ` <span class="text-gray-600">(${item.toppings.join(", ")})</span>`
@@ -189,9 +207,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     allOrders.push(newOrder);
     localStorage.setItem("orders", JSON.stringify(allOrders));
 
-    // Increment order number
     orderNumber++;
     localStorage.setItem("orderNumber", orderNumber);
+    localStorage.setItem("orderDate", today); // <-- add this line
     orderNumberEl.textContent = orderNumber;
 
     // Reset current order
