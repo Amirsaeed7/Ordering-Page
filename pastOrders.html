@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>سفارشات قبلی</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              vazir: ["Vazirmatn", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        font-family: "Vazirmatn", sans-serif;
+        background-color: #f3f4f6;
+      }
+    </style>
+  </head>
+
+  <body class="max-w-5xl mx-auto py-6 px-4">
+    <h1 class="text-3xl font-bold text-center mb-6">📜 سفارشات قبلی</h1>
+
+    <!-- Back to main page -->
+    <div class="flex justify-center mb-6">
+      <a
+        href="order.html"
+        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+      >
+        ← بازگشت به صفحه سفارش
+      </a>
+    </div>
+
+    <!-- Container for past orders -->
+    <div id="pastOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+    <!-- Template if no orders -->
+    <div id="noOrders" class="text-center text-gray-500 hidden">
+      هیچ سفارشی در حافظه ذخیره نشده است.
+    </div>
+
+    <!-- External JS -->
+    <script src="pastOrders.js"></script>
+  </body>
+</html>

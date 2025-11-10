@@ -1,3 +1,4 @@
+// js/order.js
 document.addEventListener("DOMContentLoaded", async () => {
   const menuContainer = document.getElementById("menuContainer");
   const submitFoodBtn = document.getElementById("submitFood");
@@ -28,17 +29,105 @@ document.addEventListener("DOMContentLoaded", async () => {
   let orderNumber = savedOrderNumber;
   orderNumberEl.textContent = orderNumber;
 
+  // Utilities
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // Try to load persisted prices (so prices don't change every reload)
+  function loadPersistedPrices() {
+    try {
+      const raw = localStorage.getItem("menuPrices_v1");
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function savePersistedPrices(obj) {
+    try {
+      localStorage.setItem("menuPrices_v1", JSON.stringify(obj));
+    } catch (e) {
+      // ignore
+    }
+  }
+
   // Fetch menu data
   try {
     const res = await fetch("menuData.json");
     menuData = await res.json();
+
+    // Ensure menuData has expected arrays
+    if (!Array.isArray(menuData.foods)) menuData.foods = [];
+    if (!Array.isArray(menuData.toppings)) menuData.toppings = [];
+
+    // Load persisted prices (if any)
+    const persisted = loadPersistedPrices();
+
+    // Build price mappings (use persisted if available, else generate and persist)
+    const priceMap = { foods: {}, toppings: {} };
+
+    // Foods: assign price 100-150
+    menuData.foods = menuData.foods.map((f) => {
+      const name = f.name;
+      const price =
+        (persisted && persisted.foods && persisted.foods[name] != null)
+          ? persisted.foods[name]
+          : randInt(100, 150);
+      priceMap.foods[name] = price;
+      return { name, price };
+    });
+
+    // Toppings: assign price 10-20
+    menuData.toppings = menuData.toppings.map((t) => {
+      // if toppings array contains objects (name, price), normalize
+      if (typeof t === "object" && t.name) {
+        // if price already present, keep; else generate or use persisted
+        const name = t.name;
+        const price =
+          (persisted && persisted.toppings && persisted.toppings[name] != null)
+            ? persisted.toppings[name]
+            : (typeof t.price === "number" ? t.price : randInt(10, 20));
+        priceMap.toppings[name] = price;
+        return { name, price };
+      } else {
+        const name = String(t);
+        const price =
+          (persisted && persisted.toppings && persisted.toppings[name] != null)
+            ? persisted.toppings[name]
+            : randInt(10, 20);
+        priceMap.toppings[name] = price;
+        return { name, price };
+      }
+    });
+
+    // Persist prices if none existed
+    if (!persisted) {
+      savePersistedPrices(priceMap);
+    }
+
     renderMenu();
   } catch (err) {
     console.error("Error loading menu data:", err);
   }
 
+  // price helpers
+  function getPriceForFood(name) {
+    const f = menuData.foods.find((x) => x.name === name);
+    return f ? f.price : 0;
+  }
+  function getPriceForTopping(name) {
+    const t = menuData.toppings.find((x) => x.name === name);
+    return t ? t.price : 0;
+  }
+
+  function formatCurrency(n) {
+    return `${n} تومان`;
+  }
+
   // Render menu
   function renderMenu() {
+    if (!menuContainer) return;
     menuContainer.innerHTML = "";
 
     const section = document.createElement("div");
@@ -73,9 +162,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         selectedFood = foodCheckbox.checked ? food : null;
       });
 
-      const foodText = document.createTextNode(food.name);
+      const textWrap = document.createElement("div");
+      textWrap.className = "flex flex-col";
+      const foodNameSpan = document.createElement("span");
+      foodNameSpan.textContent = food.name;
+      const foodPriceSpan = document.createElement("span");
+      foodPriceSpan.className = "text-sm text-gray-600";
+      foodPriceSpan.textContent = formatCurrency(food.price);
+
+      textWrap.appendChild(foodNameSpan);
+      textWrap.appendChild(foodPriceSpan);
+
       foodLabel.appendChild(foodCheckbox);
-      foodLabel.appendChild(foodText);
+      foodLabel.appendChild(textWrap);
       foodList.appendChild(foodLabel);
     });
 
@@ -101,19 +200,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       const topCheckbox = document.createElement("input");
       topCheckbox.type = "checkbox";
       topCheckbox.classList.add("topping-checkbox");
-      topCheckbox.value = top;
+      topCheckbox.value = top.name;
 
       topCheckbox.addEventListener("change", () => {
         if (topCheckbox.checked) {
-          selectedToppings.push(top);
+          if (!selectedToppings.includes(top.name)) selectedToppings.push(top.name);
         } else {
-          selectedToppings = selectedToppings.filter((t) => t !== top);
+          selectedToppings = selectedToppings.filter((t) => t !== top.name);
         }
       });
 
-      const topText = document.createTextNode(top);
+      const textWrap = document.createElement("div");
+      textWrap.className = "flex flex-col";
+      const topNameSpan = document.createElement("span");
+      topNameSpan.textContent = top.name;
+      const topPriceSpan = document.createElement("span");
+      topPriceSpan.className = "text-sm text-gray-600";
+      topPriceSpan.textContent = `+ ${formatCurrency(top.price)}`;
+
+      textWrap.appendChild(topNameSpan);
+      textWrap.appendChild(topPriceSpan);
+
       topLabel.appendChild(topCheckbox);
-      topLabel.appendChild(topText);
+      topLabel.appendChild(textWrap);
       toppingList.appendChild(topLabel);
     });
 
@@ -130,24 +239,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    // compute item total: food price + toppings prices
+    const basePrice = getPriceForFood(selectedFood.name);
+    const toppingsPrices = selectedToppings.map((t) => getPriceForTopping(t) || 0);
+    const toppingsTotal = toppingsPrices.reduce((s, v) => s + v, 0);
+    const itemTotal = basePrice + toppingsTotal;
+
     const orderItem = {
       food: selectedFood.name,
-      toppings: selectedToppings,
+      foodPrice: basePrice,
+      toppings: [...selectedToppings],
+      toppingsTotal,
+      itemTotal,
     };
 
     currentOrder.push(orderItem);
     updateOrderList();
 
     // Reset selections
-    document
-      .querySelectorAll('input[type="checkbox"]')
-      .forEach((cb) => (cb.checked = false));
+    document.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
 
     selectedFood = null;
     selectedToppings = [];
   });
 
-  // Update order summary (now with delete button per item)
+  // Update order summary (with delete button per item and factor total)
   function updateOrderList() {
     orderList.innerHTML = "";
 
@@ -159,18 +275,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    let factorTotal = 0;
+
     currentOrder.forEach((item, index) => {
+      factorTotal += item.itemTotal || 0;
+
       const li = document.createElement("li");
-      li.className =
-        "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md shadow-sm mb-2";
+      li.className = "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md shadow-sm mb-2";
 
       const info = document.createElement("div");
       info.className = "flex flex-col";
-      info.innerHTML = `<strong>${item.food}</strong>${
-        item.toppings && item.toppings.length
-          ? ` <span class="text-gray-600">(${item.toppings.join(", ")})</span>`
-          : ""
-      }`;
+      const titleRow = document.createElement("div");
+      titleRow.className = "flex items-center gap-3";
+      const nameEl = document.createElement("strong");
+      nameEl.textContent = item.food;
+      const priceEl = document.createElement("span");
+      priceEl.className = "text-sm text-gray-700";
+      priceEl.textContent = formatCurrency(item.itemTotal || 0);
+
+      titleRow.appendChild(nameEl);
+      titleRow.appendChild(priceEl);
+
+      const toppingsEl = document.createElement("div");
+      toppingsEl.className = "text-xs text-gray-600";
+      toppingsEl.textContent =
+        item.toppings && item.toppings.length ? `(${item.toppings.join(", ")})` : "";
+
+      info.appendChild(titleRow);
+      info.appendChild(toppingsEl);
 
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
@@ -187,6 +319,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       li.appendChild(deleteBtn);
       orderList.appendChild(li);
     });
+
+    // factor total row
+    const totalLi = document.createElement("li");
+    totalLi.className = "mt-3 pt-2 border-t border-gray-200 text-right font-bold";
+    totalLi.textContent = `جمع کل فاکتور: ${formatCurrency(factorTotal)}`;
+    orderList.appendChild(totalLi);
   }
 
   // Submit whole order
@@ -198,9 +336,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const allOrders = JSON.parse(localStorage.getItem("orders")) || [];
 
+    // compute order total
+    const orderTotal = currentOrder.reduce((s, it) => s + (it.itemTotal || 0), 0);
+
     const newOrder = {
       orderNumber,
       items: currentOrder,
+      total: orderTotal,
       date: new Date().toLocaleString("fa-IR"),
     };
 
@@ -209,7 +351,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     orderNumber++;
     localStorage.setItem("orderNumber", orderNumber);
-    localStorage.setItem("orderDate", today); // <-- add this line
+    localStorage.setItem("orderDate", today);
     orderNumberEl.textContent = orderNumber;
 
     // Reset current order
@@ -219,3 +361,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("سفارش با موفقیت ثبت شد ✅");
   });
 });
+ 

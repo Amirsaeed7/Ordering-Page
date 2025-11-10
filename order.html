@@ -56,19 +56,43 @@
         border-radius: 0.5rem;
         padding: 0.5rem 0.75rem;
         cursor: pointer;
+        transition: all 0.2s ease-in-out;
       }
 
       label:hover {
         background-color: #e5e7eb;
       }
+
+      .price {
+        font-size: 0.875rem;
+        color: #4b5563;
+      }
     </style>
   </head>
 
-  <body class="max-w-6xl mx-auto py-6 px-4">
-    <h1 class="text-3xl font-bold text-center mb-6">🧾 ثبت سفارش غذا</h1>
+  <body class="max-w-5xl mx-auto py-6 px-4">
+    <!-- Header -->
+    <header class="text-center mb-6">
+      <h1 class="text-3xl font-extrabold text-blue-700 mb-2">
+        🍽️ سیستم ثبت سفارش غذا
+      </h1>
+      <p class="text-gray-700 text-lg">
+        لطفاً غذا و تاپینگ‌های مورد نظر خود را انتخاب کنید.
+      </p>
+      <div class="flex justify-center mt-4">
+      <a
+        href="pastOrders.html"
+        class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
+      >
+        📜 مشاهده سفارشات قبلی
+      </a>
+    </div>
+    </header>
 
     <!-- Order Number -->
-    <div class="text-center text-lg mb-6">
+    <div
+      class="text-center text-lg mb-6 bg-white shadow-sm py-3 rounded-md font-semibold"
+    >
       شماره سفارش:
       <span id="orderNumber" class="font-bold text-blue-600">1</span>
     </div>
@@ -91,8 +115,18 @@
       id="orderSummary"
       class="bg-white rounded-lg shadow-md mt-8 p-4 max-w-md mx-auto"
     >
-      <h2 class="text-2xl font-bold mb-4">🧾 فاکتور سفارش</h2>
-      <ul id="orderList" class="list-disc pr-6 space-y-2"></ul>
+      <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">
+        🧾 فاکتور سفارش
+      </h2>
+      <ul id="orderList" class="space-y-2"></ul>
+
+      <!-- Total section -->
+      <div
+        id="totalSection"
+        class="text-right font-bold text-lg text-blue-700 mt-4 border-t pt-2 hidden"
+      >
+        جمع کل فاکتور: ۰ تومان
+      </div>
     </div>
 
     <!-- Submit Whole Order -->
@@ -104,6 +138,7 @@
         ثبت کل سفارش ✅
       </button>
     </div>
+    
 
     <script src="order.js"></script>
   </body>
