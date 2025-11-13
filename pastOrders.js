@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // helper currency formatter (you can adapt to Persian digits if you want)
   function formatCurrency(n) {
-    return `${n} تومان`;
+    return `<span class="whitespace-nowrap">${n}&nbsp;تومان</span>`;
   }
 
   // load menu data and/or persisted price map
@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (Array.isArray(menuData.foods)) {
           menuData.foods.forEach((f) => {
             const name = f.name;
-            const price = (typeof f.price === "number") ? f.price : priceMap.foods[name];
+            const price =
+              typeof f.price === "number" ? f.price : priceMap.foods[name];
             if (price != null) priceMap.foods[name] = price;
           });
         }
@@ -42,7 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
           menuData.toppings.forEach((t) => {
             if (typeof t === "object" && t.name) {
               const name = t.name;
-              const price = (typeof t.price === "number") ? t.price : priceMap.toppings[name];
+              const price =
+                typeof t.price === "number" ? t.price : priceMap.toppings[name];
               if (price != null) priceMap.toppings[name] = price;
             } else {
               const name = String(t);
@@ -77,7 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // render each order
     orders.forEach((order, orderIndex) => {
       const card = document.createElement("div");
-      card.className = "bg-white rounded-lg shadow-md p-4 flex flex-col justify-between mb-4";
+      card.className =
+        "bg-white rounded-lg shadow-md p-4 flex flex-col justify-between mb-4";
 
       // Header
       const header = document.createElement("div");
@@ -120,7 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // toppings normalization: array of objects {name, price}
         let toppingsArr = [];
         if (Array.isArray(item.toppings)) {
-          if (item.toppings.length > 0 && typeof item.toppings[0] === "string") {
+          if (
+            item.toppings.length > 0 &&
+            typeof item.toppings[0] === "string"
+          ) {
             // strings, map to {name, price}
             toppingsArr = item.toppings.map((tName) => {
               const price = safeNumber(priceMap.toppings[tName]) || 0;
@@ -130,10 +136,19 @@ document.addEventListener("DOMContentLoaded", () => {
             // assume objects, but ensure shape
             toppingsArr = item.toppings.map((t) => {
               if (typeof t === "object" && t !== null) {
-                return { name: t.name ?? String(t), price: safeNumber(t.price) || safeNumber(priceMap.toppings[t.name]) || 0 };
+                return {
+                  name: t.name ?? String(t),
+                  price:
+                    safeNumber(t.price) ||
+                    safeNumber(priceMap.toppings[t.name]) ||
+                    0,
+                };
               } else {
                 const name = String(t);
-                return { name, price: safeNumber(priceMap.toppings[name]) || 0 };
+                return {
+                  name,
+                  price: safeNumber(priceMap.toppings[name]) || 0,
+                };
               }
             });
           }
@@ -143,7 +158,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const itemTotal =
           safeNumber(item.itemTotal) ||
           safeNumber(item.total) ||
-          (foodPrice + toppingsArr.reduce((s, tt) => s + safeNumber(tt.price), 0));
+          foodPrice +
+            toppingsArr.reduce((s, tt) => s + safeNumber(tt.price), 0);
 
         totalCost += itemTotal;
 
@@ -155,13 +171,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 .join(", ")}</div>`
             : "";
 
-        li.innerHTML = `<div class="flex justify-between items-start gap-3">
-                          <div>
+        li.innerHTML = `
+                         <div class="flex justify-between items-start w-full gap-3">
+                          <div class="flex-1 text-right">
                             <strong>${foodName}</strong>
-                            ${toppingsHtml}
+                             ${toppingsHtml}
                           </div>
-                          <div class="text-sm text-gray-700">${formatCurrency(itemTotal)}</div>
-                        </div>`;
+                          <div class="text-sm text-gray-700 text-left min-w-[80px] ml-auto">
+                            ${formatCurrency(itemTotal)}
+                          </div>
+                       </div>`;
         list.appendChild(li);
       });
 
@@ -169,14 +188,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Footer with total and delete button
       const footer = document.createElement("div");
-      footer.className = "flex items-center justify-between mt-4 border-t pt-2";
+      footer.className = "flex flex-col items-center justify-between mt-4 border-t pt-2 gap-2";
 
       const totalEl = document.createElement("div");
       totalEl.className = "font-bold text-green-700";
-      totalEl.textContent = `مجموع سفارش: ${formatCurrency(totalCost)}`;
+      totalEl.innerHTML = `مجموع سفارش: ${formatCurrency(totalCost)}`;
 
       const deleteBtn = document.createElement("button");
-      deleteBtn.className = "text-red-600 hover:text-red-800 text-sm font-medium";
+      deleteBtn.className = "text-white hover:bg-red-300 text-sm font-medium bg-red-600 p-3 rounded-lg";
       deleteBtn.textContent = "🗑️ حذف سفارش";
       deleteBtn.addEventListener("click", () => {
         if (confirm("آیا از حذف این سفارش مطمئن هستید؟")) {
@@ -188,7 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
           card.remove();
           // if nothing left show message
           const remaining = stored.length;
-          if (remaining === 0 && noOrdersMsg) noOrdersMsg.classList.remove("hidden");
+          if (remaining === 0 && noOrdersMsg)
+            noOrdersMsg.classList.remove("hidden");
         }
       });
 
