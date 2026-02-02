@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>سیستم ثبت سفارش</title>
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Local vendor CSS (single merged file) -->
+    <link rel="stylesheet" href="assets/tailwind.min.css" />
+    <!-- Local font css (create assets/fonts.css + place font files under assets/fonts/) -->
+    <link rel="stylesheet" href="assets/fonts.css" />
+    <link rel="stylesheet" href="./main.css" />
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0ea5e9">
 
-    <!-- Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap"
-      rel="stylesheet"
-    />
 
     <script>
       tailwind.config = {
@@ -71,6 +71,7 @@
   </head>
 
   <body class="max-w-5xl mx-auto py-6 px-4">
+  <button id="installBtn" class="hidden fixed bottom-6 left-6 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">نصب اپ</button>
     <!-- Header -->
     <header class="text-center mb-6">
       <h1 class="text-3xl font-extrabold text-blue-700 mb-2">

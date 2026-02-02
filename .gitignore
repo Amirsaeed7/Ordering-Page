@@ -1,0 +1,33 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Build outputs
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# Tailwind temporary/merged files (generated)
+assets/tailwind.merged.min.css
+assets/tailwind-compat.css
+assets/tailwind-fixes.css
+assets/*.map
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.*.local
