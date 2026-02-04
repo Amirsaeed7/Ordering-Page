@@ -52,8 +52,8 @@
       </a>
     </div>
 
-    <!-- Container for past orders -->
-    <div id="pastOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    <!-- Container for past orders (direction: ltr so first child = newest is at top) -->
+    <div id="pastOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4" style="direction: ltr;"></div>
 
     <!-- Template if no orders -->
     <div id="noOrders" class="text-center text-gray-500 hidden">

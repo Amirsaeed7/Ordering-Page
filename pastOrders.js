@@ -85,11 +85,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (noOrdersMsg) noOrdersMsg.classList.add("hidden");
 
-  // Show newest first: iterate oldest→newest and prepend each card so newest ends up on top
-  rawOrders.forEach((order, orderIndex) => {
+  // Show newest first: iterate from last (newest) to first (oldest) and append so DOM order is [newest, ..., oldest]
+  for (let i = rawOrders.length - 1; i >= 0; i--) {
+    const order = rawOrders[i];
+    const orderIndex = i;
     const card = document.createElement("div");
     card.className =
       "bg-white rounded-lg shadow-md p-4 flex flex-col justify-between mb-4";
+    card.setAttribute("dir", "rtl");
 
     // ===== Header =====
     const header = document.createElement("div");
@@ -218,7 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     card.appendChild(footer);
 
-    pastOrdersContainer.insertBefore(card, pastOrdersContainer.firstChild);
+    pastOrdersContainer.appendChild(card);
 
     function openPrintModal(order) {
       let margin = 20;
@@ -343,5 +346,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         applyMargin();
       };
     }
-  });
+  }
 });
