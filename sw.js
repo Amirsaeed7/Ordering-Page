@@ -45,10 +45,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // navigation requests: try network first then cache fallback
+  // navigation requests: try network first, then cached requested URL, then order.html
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req).catch(() => caches.match('order.html'))
+      fetch(req).catch(() =>
+        caches.match(req).then((cached) => cached || caches.match('order.html'))
+      )
     );
     return;
   }

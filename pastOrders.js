@@ -1,8 +1,54 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const pastOrdersContainer = document.getElementById("pastOrdersContainer");
   const noOrdersMsg = document.getElementById("noOrders");
 
-  const rawOrders = JSON.parse(localStorage.getItem("orders")) || [];
+  // -------------------------
+  // PWA: Service Worker, install prompt, update banner
+  // -------------------------
+  if ('serviceWorker' in navigator) {
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js');
+      if (reg.waiting) handleSWWaiting(reg);
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW?.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            handleSWWaiting(reg);
+          }
+        });
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+    } catch (err) {
+      console.warn('SW reg failed on pastOrders', err);
+    }
+  }
+
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.classList.remove('hidden');
+  });
+  const installBtn = document.getElementById('installBtn');
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if (choice.outcome === 'accepted') installBtn.classList.add('hidden');
+      deferredPrompt = null;
+    });
+  }
+
+  function handleSWWaiting(reg) {
+    const banner = document.getElementById('updateBanner');
+    const btn = document.getElementById('updateReloadBtn');
+    if (banner) banner.classList.remove('hidden');
+    if (btn) btn.onclick = () => { reg.waiting.postMessage('SKIP_WAITING'); };
+  }
 
   // -------------------------
   // Helpers
@@ -30,12 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------
   // Main
   // -------------------------
-  // Register service worker (optional: helps PWA work on this page too)
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch((err) =>
-      console.warn('SW reg failed on pastOrders', err)
-    );
-  }
+  const rawOrders = JSON.parse(localStorage.getItem("orders")) || [];
+
   if (!rawOrders.length) {
     if (noOrdersMsg) noOrdersMsg.classList.remove("hidden");
     return;

@@ -46,11 +46,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function handleSWWaiting(reg) {
-    // simple update prompt — you can replace confirm() with a nicer UI
-    const updateNow = confirm('نسخه جدید در دسترس است. بارگذاری مجدد برای دریافت بروزرسانی؟');
-    if (updateNow) {
-      reg.waiting.postMessage('SKIP_WAITING');
-    }
+    const banner = document.getElementById('updateBanner');
+    const btn = document.getElementById('updateReloadBtn');
+    if (banner) banner.classList.remove('hidden');
+    if (btn) btn.onclick = () => { reg.waiting.postMessage('SKIP_WAITING'); };
   }
   const menuContainer = document.getElementById("menuContainer");
   const submitFoodBtn = document.getElementById("submitFood");
