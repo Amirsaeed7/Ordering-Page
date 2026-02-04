@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (noOrdersMsg) noOrdersMsg.classList.add("hidden");
 
+  // Show newest first: iterate oldest→newest and prepend each card so newest ends up on top
   rawOrders.forEach((order, orderIndex) => {
     const card = document.createElement("div");
     card.className =
@@ -217,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     card.appendChild(footer);
 
-    pastOrdersContainer.appendChild(card);
+    pastOrdersContainer.insertBefore(card, pastOrdersContainer.firstChild);
 
     function openPrintModal(order) {
       let margin = 20;
