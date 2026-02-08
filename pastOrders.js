@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let totalCost = 0;
 
-    (order.items || []).forEach((item) => {
+    (order.items || []).forEach((item, itemIndex) => {
       // ---- Normalize base food ----
       const foodName = item.ramen || item.food || item.name || "نامشخص";
 
@@ -153,26 +153,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       totalCost += itemTotal;
 
       // ---- Render item ----
+      const foodNumber = itemIndex + 1;
+      const foodLabel = `غذای ${foodNumber}`;
+      
+      const allItems = extrasArr.length
+        ? `${extrasArr
+              .map(
+                (e) =>
+                  `${e.name} ×${e.qty}${
+                    e.price ? `` : ""
+                  }`,
+              )
+              .join(" ")} ${foodName}`
+        : foodName;
+      
       const li = document.createElement("li");
       li.className =
         "flex justify-between items-start gap-3 bg-gray-50 p-3 rounded";
 
-      const extrasText = extrasArr.length
-        ? `<div class="text-xs text-gray-600 mt-1">
-            (${extrasArr
-              .map(
-                (e) =>
-                  `${e.name} ×${e.qty}${
-                    e.price ? ` (${formatCurrency(e.price * e.qty)})` : ""
-                  }`,
-              )
-              .join(", ")})
-           </div>`
-        : "";
+      const extrasText = `<div class="text-xs text-gray-600 mt-1">
+            (${allItems})
+           </div>`;
 
       li.innerHTML = `
         <div class="flex-1 text-right">
-          <strong>${foodName}</strong>
+          <strong>${foodLabel}</strong>
           ${extrasText}
         </div>
         <div class="text-sm text-gray-700 min-w-[90px] text-left">
@@ -270,20 +275,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         <h3 class="text-lg font-bold mb-4 text-center border-b pb-2">Order #${order.orderNumber}</h3>
         <ul class="space-y-3">
           ${order.items
-            .map((item) => {
+            .map((item, itemIndex) => {
+              const foodNumber = itemIndex + 1;
+              const foodLabel = `food ${foodNumber}`;
+              
               const extras = item.extras?.length
-                ? `<div class="text-xs text-gray-500 mt-1 text-right">${item.extras
+                ? item.extras
                     .map((e) => `${toFingilish(e.name)} ×${e.qty}`)
-                    .join("<br>")}</div>`
+                    .join(" - ")
                 : "";
+              
+              const allItems = extras
+                ? `${toFingilish(item.ramen)} - ${extras}`
+                : toFingilish(item.ramen);
 
               return `
                 <li class="border-b pb-2">
                   <div class="flex justify-between items-start">
                     <div class="text-sm font-medium">${item.itemTotal} T</div>
                     <div>
-                      <div class="font-semibold text-sm">${toFingilish(item.ramen)}</div>
-                      ${extras}
+                      <div class="font-semibold text-sm text-left">${foodLabel}</div>
+                      <div class="text-xs text-gray-500 mt-1 text-right">(${allItems})</div>
                     </div>
                   </div>
                 </li>

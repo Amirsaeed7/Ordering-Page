@@ -247,12 +247,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     orderList.innerHTML = "";
     let total = 0;
 
-    currentOrder.forEach((item, i) => {
+    currentOrder.forEach((item, itemIndex) => {
       total += item.itemTotal;
 
       const extrasText = item.extras
         .map((e) => `${e.name} ×${e.qty}`)
         .join(", ");
+
+      const foodNumber = itemIndex + 1;
+      const foodLabel = `غذای ${foodNumber}`;
+      
+      const allItems = extrasText ? `${extrasText} ${item.ramen}` : item.ramen;
 
       const li = document.createElement("li");
       li.className =
@@ -260,10 +265,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       li.innerHTML = `
         <div>
-          <strong>${item.ramen}</strong>
+          <strong>${foodLabel}</strong>
           ${
-            extrasText
-              ? `<div class="text-xs text-gray-600">(${extrasText})</div>`
+            allItems
+              ? `<div class="text-xs text-gray-600">(${allItems})</div>`
               : ""
           }
         </div>
