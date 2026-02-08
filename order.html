@@ -71,11 +71,14 @@
   </head>
 
   <body class="max-w-5xl mx-auto py-6 px-4">
-  <button id="installBtn" class="hidden fixed bottom-6 left-6 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">نصب اپ</button>
-  <div id="updateBanner" class="hidden fixed bottom-6 right-6 left-6 md:left-auto md:right-6 md:max-w-sm bg-amber-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center justify-between gap-2">
-    <span>نسخه جدید آماده است.</span>
-    <button id="updateReloadBtn" type="button" class="bg-white text-amber-700 px-3 py-1 rounded font-medium">بروزرسانی</button>
-  </div>
+    <!-- PWA: install + update at top, scroll with page -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <button id="installBtn" class="hidden bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">نصب اپ</button>
+      <div id="updateBanner" class="hidden flex-1 min-w-0 flex items-center justify-between gap-3 px-4 py-3 rounded-lg border-2 border-amber-600 shadow-md" style="background-color: #d97706; color: #fff;">
+        <span class="font-medium">نسخه جدید آماده است.</span>
+        <button id="updateReloadBtn" type="button" class="bg-black text-amber-800 px-3 py-1.5 rounded font-medium hover:bg-amber-50 shrink-0">بروزرسانی</button>
+      </div>
+    </div>
     <!-- Header -->
     <header class="text-center mb-6">
       <h1 class="text-3xl font-extrabold text-blue-700 mb-2">

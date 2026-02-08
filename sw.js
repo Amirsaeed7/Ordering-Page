@@ -1,3 +1,4 @@
+//update notif test v7
 const CACHE_NAME = 'ordering-app-v1';
 const ASSETS_TO_CACHE = [
   'order.html',
@@ -26,8 +27,10 @@ const ASSETS_TO_CACHE = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
+  // Do NOT call skipWaiting() here — we want the new worker to stay "waiting"
+  // so the page can show the update banner. User clicks "بروزرسانی" → postMessage('SKIP_WAITING') → then we skipWaiting() in the 'message' handler.
 });
 
 self.addEventListener('activate', (event) => {
