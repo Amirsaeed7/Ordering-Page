@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     menuData.ramens.forEach((ramen) => {
       const label = document.createElement("label");
-      label.className = "item-card cursor-pointer";
+      label.className = "item-card cursor-pointer min-w-[180px] min-h-[100px]";
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
