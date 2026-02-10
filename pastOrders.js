@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     e.price ? `` : ""
                   }`,
               )
-              .join(" ")} ${foodName}`
+              .join(" - ")} - ${foodName}`
         : foodName;
       
       const li = document.createElement("li");
@@ -279,15 +279,13 @@ document.addEventListener("DOMContentLoaded", async () => {
               const foodNumber = itemIndex + 1;
               const foodLabel = `food ${foodNumber}`;
               
-              const extras = item.extras?.length
-                ? item.extras
-                    .map((e) => `${toFingilish(e.name)} ×${e.qty}`)
-                    .join(" - ")
-                : "";
+              const ramenLine = `<div class="text-sm text-left">${toFingilish(item.ramen)}</div>`;
               
-              const allItems = extras
-                ? `${toFingilish(item.ramen)} - ${extras}`
-                : toFingilish(item.ramen);
+              const extrasLines = item.extras?.length
+                ? item.extras
+                    .map((e) => `<div class="text-sm text-left">${toFingilish(e.name)} ×${e.qty}</div>`)
+                    .join("")
+                : "";
 
               return `
                 <li class="border-b pb-2">
@@ -295,7 +293,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="text-sm font-medium">${item.itemTotal} T</div>
                     <div>
                       <div class="font-semibold text-sm text-left">${foodLabel}</div>
-                      <div class="text-xs text-gray-500 mt-1 text-right">(${allItems})</div>
+                      ${ramenLine}
+                      ${extrasLines}
                     </div>
                   </div>
                 </li>

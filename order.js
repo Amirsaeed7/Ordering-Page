@@ -252,12 +252,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const extrasText = item.extras
         .map((e) => `${e.name} ×${e.qty}`)
-        .join(", ");
+        .join("- ");
 
       const foodNumber = itemIndex + 1;
       const foodLabel = `غذای ${foodNumber}`;
       
-      const allItems = extrasText ? `${extrasText} ${item.ramen}` : item.ramen;
+      const allItems = extrasText ? `${extrasText} - ${item.ramen}` : item.ramen;
 
       const li = document.createElement("li");
       li.className =
