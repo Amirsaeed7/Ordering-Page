@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     (order.items || []).forEach((item, itemIndex) => {
       // ---- Normalize base food ----
-      const foodName = item.ramen || item.food || item.name || "نامشخص";
+      const foodName = item.ramen || item.food || item.name || null;
 
       const foodPrice =
         safeNumber(item.ramenPrice) ||
@@ -156,16 +156,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       const foodNumber = itemIndex + 1;
       const foodLabel = `غذای ${foodNumber}`;
       
-      const allItems = extrasArr.length
-        ? `${extrasArr
-              .map(
-                (e) =>
-                  `${e.name} ×${e.qty}${
-                    e.price ? `` : ""
-                  }`,
-              )
-              .join(" - ")} - ${foodName}`
-        : foodName;
+      const allItems = foodName
+        ? (extrasArr.length
+            ? `${extrasArr
+                  .map(
+                    (e) =>
+                      `${e.name} ×${e.qty}${
+                        e.price ? `` : ""
+                      }`,
+                  )
+                  .join(" - ")} - ${foodName}`
+            : foodName)
+        : extrasArr
+            .map(
+              (e) =>
+                `${e.name} ×${e.qty}${
+                  e.price ? `` : ""
+                }`,
+            )
+            .join(" - ");
       
       const li = document.createElement("li");
       li.className =
@@ -279,7 +288,9 @@ document.addEventListener("DOMContentLoaded", async () => {
               const foodNumber = itemIndex + 1;
               const foodLabel = `food ${foodNumber}`;
               
-              const ramenLine = `<div class="text-sm text-left">${toFingilish(item.ramen)}</div>`;
+              const ramenLine = item.ramen
+                ? `<div class="text-sm text-left">${toFingilish(item.ramen)}</div>`
+                : "";
               
               const extrasLines = item.extras?.length
                 ? item.extras

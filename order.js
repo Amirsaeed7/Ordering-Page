@@ -212,11 +212,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Add item
   // -------------------------
   submitFoodBtn.onclick = () => {
-    if (!selectedRamen) {
-      alert("لطفاً یک رامن انتخاب کنید.");
-      return;
-    }
-
     let extras = [];
     let extrasTotal = 0;
 
@@ -228,11 +223,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
 
+    const ramenPrice = selectedRamen ? selectedRamen.price : 0;
+    const itemTotal = ramenPrice + extrasTotal;
+
     currentOrder.push({
-      ramen: selectedRamen.name,
-      ramenPrice: selectedRamen.price,
+      ramen: selectedRamen ? selectedRamen.name : null,
+      ramenPrice,
       extras,
-      itemTotal: selectedRamen.price + extrasTotal,
+      itemTotal,
     });
 
     selectedExtras = { toppings: {}, others: {} };
@@ -257,7 +255,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const foodNumber = itemIndex + 1;
       const foodLabel = `غذای ${foodNumber}`;
       
-      const allItems = extrasText ? `${extrasText} - ${item.ramen}` : item.ramen;
+      const allItems = item.ramen 
+        ? (extrasText ? `${extrasText} - ${item.ramen}` : item.ramen)
+        : extrasText;
 
       const li = document.createElement("li");
       li.className =
